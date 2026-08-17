@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Validates branch naming and remote before push.
+set -euo pipefail
+
+REMOTE="$1"
+REMOTE_URL="$2"
+
+CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+
+# --- Validate remote points to the personal fork ---
+EXPECTED_REMOTE="https://github.com/alvinchow97/QuantDinger"
+EXPECTED_REMOTE_GIT="git@github.com:alvinchow97/QuantDinger.git"
+
+if [[ "$REMOTE_URL" != "$EXPECTED_REMOTE"* && "$REMOTE_URL" != "$EXPECTED_REMOTE_GIT"* ]]; then
+  echo "❌ Push blocked: remote '$REMOTE' points to '$REMOTE_URL'."
+  echo "   All pushes must go to: $EXPECTED_REMOTE"
+  echo "   Run: git remote set-url $REMOTE $EXPECTED_REMOTE"
+  exit 1
+fi
+
+# --- Validate branch naming convention ---
+# main/master are allowed directly; all others must follow the prefix pattern.
+ALLOWED_PATTERN="^(main|master|feat/.+|fix/.+|docs/.+|chore/.+|refactor/.+|test/.+|ci/.+|perf/.+|hotfix/.+|release/.+)$"
+
+if ! echo "$CURRENT_BRANCH" | grep -qE "$ALLOWED_PATTERN"; then
+  echo "❌ Branch name '$CURRENT_BRANCH' does not follow naming conventions."
+  echo ""
+  echo "   Required prefix:"
+  echo "     feat/    — new features"
+  echo "     fix/     — bug fixes"
+  echo "     docs/    — documentation"
+  echo "     chore/   — maintenance, dependency bumps"
+  echo "     refactor/ — code restructuring"
+  echo "     test/    — test additions"
+  echo "     ci/      — CI/CD changes"
+  echo "     perf/    — performance improvements"
+  echo "     hotfix/  — urgent production fixes"
+  echo "     release/ — release preparation"
+  echo ""
+  echo "   Example: git checkout -b feat/macd-indicator"
+  exit 1
+fi
+
+exit 0

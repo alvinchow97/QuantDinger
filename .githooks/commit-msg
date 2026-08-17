@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# Enforces conventional commit format and blocks AI co-author footers.
+set -euo pipefail
+
+COMMIT_MSG_FILE="$1"
+COMMIT_MSG="$(cat "$COMMIT_MSG_FILE")"
+
+# Strip trailing whitespace lines for cleaner analysis
+FIRST_LINE="$(echo "$COMMIT_MSG" | head -1)"
+
+# --- Block AI co-author footers ---
+if echo "$COMMIT_MSG" | grep -qiE "Co-Authored-By:.*Claude|generated with \[Claude|noreply@anthropic\.com"; then
+  echo "❌ Commit message must not reference Claude or Anthropic co-authorship."
+  echo "   Remove lines matching 'Co-Authored-By: Claude' or similar before committing."
+  exit 1
+fi
+
+# --- Enforce conventional commits on the subject line ---
+# Format: type(optional-scope)!?: description
+# Merge commits and revert commits are exempt.
+if echo "$FIRST_LINE" | grep -qE "^(Merge |Revert )"; then
+  exit 0
+fi
+
+CONVENTIONAL_PATTERN="^(feat|fix|docs|chore|refactor|test|ci|perf|style|build)(\([a-zA-Z0-9_/-]+\))?!?: .{1,100}$"
+
+if ! echo "$FIRST_LINE" | grep -qE "$CONVENTIONAL_PATTERN"; then
+  echo "❌ Commit subject does not follow conventional commits format."
+  echo ""
+  echo "   Required:  type(scope)?: description   (max 100 chars)"
+  echo "   Examples:"
+  echo "     feat: add MACD indicator support"
+  echo "     fix(strategy_v2): correct position sizing rounding"
+  echo "     docs: update strategy dev guide"
+  echo "     chore: bump dependencies"
+  echo ""
+  echo "   Allowed types: feat, fix, docs, chore, refactor, test, ci, perf, style, build"
+  echo "   Your subject: $FIRST_LINE"
+  exit 1
+fi
+
+# --- Block vague or boilerplate subjects ---
+if echo "$FIRST_LINE" | grep -qiE ": (wip|update|changes|minor|fix|fixes|various|cleanup|misc)$"; then
+  echo "❌ Commit subject is too vague. Describe what specifically changed."
+  echo "   Your subject: $FIRST_LINE"
+  exit 1
+fi
+
+exit 0
