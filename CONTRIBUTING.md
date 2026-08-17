@@ -113,6 +113,17 @@ cp env.example .env   # Windows: copy env.example .env
 python run.py
 ```
 
+### Git hooks
+
+Activate the repo's commit-msg and pre-push hooks once after cloning:
+
+```bash
+./scripts/setup-git-hooks.sh      # macOS/Linux
+.\scripts\setup-git-hooks.ps1     # Windows
+```
+
+This enforces the branch naming and commit message rules below at commit/push time. See [`CLAUDE.md`](CLAUDE.md#git-workflow) for the full workflow rules and PR checklist.
+
 ### Frontend
 
 The SPA lives in the private **QuantDinger-Vue** repo. Tagging a release there (`git tag vX.Y.Z && git push --tags`) triggers `.github/workflows/release-frontend.yml`, which builds a multi-arch image and pushes it to `ghcr.io/openbyteinc/quantdinger-frontend`. No frontend artefacts are committed here — pin the consumed tag via `IMAGE_TAG` (or `FRONTEND_TAG` for a per-side override) in a root-level `.env`.

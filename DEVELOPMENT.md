@@ -15,16 +15,20 @@
 git clone https://github.com/<your-org>/quantdinger.git
 cd quantdinger
 
-# 2. Configure
+# 2. Activate git hooks (commit-msg, pre-push — see CLAUDE.md#git-workflow)
+./scripts/setup-git-hooks.sh      # macOS/Linux
+.\scripts\setup-git-hooks.ps1     # Windows
+
+# 3. Configure
 cp backend_api_python/env.example backend_api_python/.env
 # Edit .env — at minimum set SECRET_KEY to a random value:
 #   SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
 # Optional: project-root `.env` with `IMAGE_PREFIX` if Docker Hub pulls are slow (see .env.example).
 
-# 3. Launch
+# 4. Launch
 docker compose up -d --build
 
-# 4. Open http://localhost:8888
+# 5. Open http://localhost:8888
 ```
 
 The stack includes:
