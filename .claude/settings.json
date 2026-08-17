@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'if echo \"$CLAUDE_TOOL_RESULT\" | grep -qiE \"Co-Authored-By:.*Claude|Co-Authored-By:.*Anthropic|noreply@anthropic\\.com|Generated with \\[Claude\"; then echo \"[git-workflow hook] WARNING: output contains a Claude/Anthropic co-author reference. If this was part of a commit, it must be removed before pushing.\" >&2; fi'"
+          }
+        ]
+      }
+    ]
+  }
+}
