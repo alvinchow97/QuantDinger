@@ -197,7 +197,14 @@ gh pr create \
 
 PRs must include: what changed and why, how to test, and any backward-compatibility notes. Follow the PR template in `.github/PULL_REQUEST_TEMPLATE.md`. Keep PRs focused and reviewable.
 
-The git hooks in `.githooks/` (active via `git config core.hooksPath .githooks`) enforce commit message format and remote validation automatically. Run `git log --oneline -5` to verify message format before pushing.
+The git hooks in `.githooks/` enforce commit message format and remote validation automatically once activated. They do **not** activate on a fresh clone automatically — run the setup script once per clone:
+
+```bash
+./scripts/setup-git-hooks.sh      # macOS/Linux
+.\scripts\setup-git-hooks.ps1     # Windows
+```
+
+Run `git log --oneline -5` to verify message format before pushing.
 
 ## High-risk legacy files (refactor targets, not extension points)
 
